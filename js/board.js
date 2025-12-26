@@ -2,14 +2,8 @@
 // 게시판 JavaScript
 // ====================================
 
-// Supabase 클라이언트 가져오기
-const supabase = window.supabaseClient || window.supabase;
-
-// Supabase 초기화 확인
-if (!supabase) {
-  console.error('❌ Supabase 클라이언트를 찾을 수 없습니다.');
-  alert('오류: 페이지를 새로고침해주세요.');
-}
+// Supabase 클라이언트 가져오기 (전역 변수 사용)
+// supabase는 supabase-client.js에서 이미 선언됨
 
 // 전역 변수
 let currentUser = null;
@@ -30,8 +24,19 @@ const authLink = document.getElementById('authLink');
 // 초기화
 // ====================================
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log('게시판 초기화 시작');
+
+  // DOM 요소 확인
+  console.log('DOM 요소 확인:');
+  console.log('- postList:', postList);
+  console.log('- writeBtn:', writeBtn);
+  console.log('- writeForm:', writeForm);
+  console.log('- postDetail:', postDetail);
+  console.log('- boardList:', boardList);
+
   // 로그인 상태 확인
   currentUser = await getCurrentUser();
+  console.log('현재 로그인 사용자:', currentUser);
   updateAuthUI();
 
   // 게시글 목록 로드
@@ -39,35 +44,67 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 이벤트 리스너 등록
   setupEventListeners();
+
+  console.log('✅ 게시판 초기화 완료');
 });
 
 // ====================================
 // 이벤트 리스너 설정
 // ====================================
 function setupEventListeners() {
-  // 글쓰기 버튼
-  writeBtn.addEventListener('click', showWriteForm);
+  // DOM 요소 확인
+  if (!writeBtn) {
+    console.error('❌ 글쓰기 버튼을 찾을 수 없습니다.');
+    return;
+  }
 
-  // 취소 버튼
-  cancelBtn.addEventListener('click', () => {
-    showBoardList();
-    resetForm();
+  // 글쓰기 버튼
+  writeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('글쓰기 버튼 클릭됨');
+    console.log('현재 사용자:', currentUser);
+    showWriteForm();
   });
 
+  // 취소 버튼
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      console.log('취소 버튼 클릭됨');
+      showBoardList();
+      resetForm();
+    });
+  }
+
   // 글 작성/수정 폼 제출
-  postForm.addEventListener('submit', handleSubmit);
+  if (postForm) {
+    postForm.addEventListener('submit', handleSubmit);
+  }
 
   // 목록 버튼
-  document.getElementById('listBtn').addEventListener('click', showBoardList);
+  const listBtn = document.getElementById('listBtn');
+  if (listBtn) {
+    listBtn.addEventListener('click', showBoardList);
+  }
 
   // 수정 버튼
-  document.getElementById('editBtn').addEventListener('click', handleEdit);
+  const editBtn = document.getElementById('editBtn');
+  if (editBtn) {
+    editBtn.addEventListener('click', handleEdit);
+  }
 
   // 삭제 버튼
-  document.getElementById('deleteBtn').addEventListener('click', handleDelete);
+  const deleteBtn = document.getElementById('deleteBtn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', handleDelete);
+  }
 
   // 이미지 미리보기
-  document.getElementById('postImage').addEventListener('change', handleImagePreview);
+  const postImage = document.getElementById('postImage');
+  if (postImage) {
+    postImage.addEventListener('change', handleImagePreview);
+  }
+
+  console.log('✅ 이벤트 리스너 등록 완료');
 }
 
 // ====================================
@@ -82,18 +119,36 @@ function showBoardList() {
 }
 
 function showWriteForm() {
+  console.log('showWriteForm 함수 실행');
+  console.log('currentUser:', currentUser);
+
   if (!currentUser) {
     alert('로그인이 필요합니다.');
     window.location.href = 'login.html';
     return;
   }
 
+  // DOM 요소 확인
+  if (!boardList || !writeForm || !postDetail) {
+    console.error('❌ DOM 요소를 찾을 수 없습니다.');
+    console.error('boardList:', boardList);
+    console.error('writeForm:', writeForm);
+    console.error('postDetail:', postDetail);
+    return;
+  }
+
+  console.log('화면 전환 시작');
   boardList.style.display = 'none';
   writeForm.style.display = 'block';
   postDetail.style.display = 'none';
 
   // 폼 제목 변경
-  writeForm.querySelector('h3').textContent = '글쓰기';
+  const formTitle = writeForm.querySelector('h3');
+  if (formTitle) {
+    formTitle.textContent = '글쓰기';
+  }
+
+  console.log('✅ 글쓰기 화면으로 전환 완료');
 }
 
 function showPostDetail() {
@@ -106,7 +161,21 @@ function showPostDetail() {
 // 로그인 상태 UI 업데이트
 // ====================================
 function updateAuthUI() {
+  console.log('updateAuthUI 실행');
+  console.log('currentUser:', currentUser);
+
+  if (!authLink) {
+    console.error('❌ authLink 요소를 찾을 수 없습니다.');
+    return;
+  }
+
+  if (!writeBtn) {
+    console.error('❌ writeBtn 요소를 찾을 수 없습니다.');
+    return;
+  }
+
   if (currentUser) {
+    console.log('✅ 로그인 상태 - 글쓰기 버튼 표시');
     authLink.textContent = '로그아웃';
     authLink.href = '#';
     authLink.addEventListener('click', async (e) => {
@@ -115,7 +184,9 @@ function updateAuthUI() {
       window.location.href = 'index.html';
     });
     writeBtn.style.display = 'block';
+    console.log('글쓰기 버튼 display:', writeBtn.style.display);
   } else {
+    console.log('❌ 비로그인 상태 - 글쓰기 버튼 숨김');
     authLink.textContent = '로그인';
     authLink.href = 'login.html';
     writeBtn.style.display = 'none';
@@ -276,15 +347,37 @@ async function handleSubmit(e) {
 // ====================================
 async function createPost(title, content) {
   try {
+    // 이미지 파일 가져오기
+    const imageInput = document.getElementById('postImage');
+    const imageFile = imageInput?.files[0];
+
+    let imageUrl = null;
+
+    // 이미지가 있으면 업로드
+    if (imageFile) {
+      console.log('이미지 업로드 시작...');
+      const uploadResult = await uploadImage(imageFile);
+      if (uploadResult) {
+        imageUrl = uploadResult.url;
+        console.log('이미지 URL:', imageUrl);
+      }
+    }
+
+    // 게시글 데이터 생성
+    const postData = {
+      title: title,
+      content: content,
+      user_id: currentUser.id
+    };
+
+    // 이미지 URL이 있으면 추가
+    if (imageUrl) {
+      postData.image_url = imageUrl;
+    }
+
     const { data, error } = await supabase
       .from('posts')
-      .insert([
-        {
-          title: title,
-          content: content,
-          user_id: currentUser.id
-        }
-      ])
+      .insert([postData])
       .select();
 
     if (error) throw error;
@@ -305,12 +398,52 @@ async function createPost(title, content) {
 // ====================================
 async function updatePost(title, content) {
   try {
+    // 기존 게시글 정보 가져오기 (이미지 URL 확인용)
+    const { data: existingPost } = await supabase
+      .from('posts')
+      .select('image_url')
+      .eq('id', currentPostId)
+      .single();
+
+    const oldImageUrl = existingPost?.image_url;
+
+    // 새 이미지 파일 확인
+    const imageInput = document.getElementById('postImage');
+    const imageFile = imageInput?.files[0];
+
+    let newImageUrl = oldImageUrl; // 기본값은 기존 이미지 URL
+
+    // 새 이미지가 업로드된 경우
+    if (imageFile) {
+      console.log('새 이미지 업로드 시작...');
+      const uploadResult = await uploadImage(imageFile);
+
+      if (uploadResult) {
+        newImageUrl = uploadResult.url;
+        console.log('새 이미지 URL:', newImageUrl);
+
+        // 기존 이미지 삭제
+        if (oldImageUrl) {
+          console.log('기존 이미지 삭제 중...');
+          await deleteImage(oldImageUrl);
+        }
+      }
+    }
+
+    // 게시글 업데이트
+    const updateData = {
+      title: title,
+      content: content
+    };
+
+    // 이미지 URL 추가 (null이어도 괜찮음)
+    if (newImageUrl !== undefined) {
+      updateData.image_url = newImageUrl;
+    }
+
     const { error } = await supabase
       .from('posts')
-      .update({
-        title: title,
-        content: content
-      })
+      .update(updateData)
       .eq('id', currentPostId)
       .eq('user_id', currentUser.id); // 본인 글만 수정 가능
 
@@ -372,6 +505,20 @@ async function handleDelete() {
   }
 
   try {
+    // 게시글 정보 가져오기 (이미지 URL 확인용)
+    const { data: post } = await supabase
+      .from('posts')
+      .select('image_url')
+      .eq('id', currentPostId)
+      .single();
+
+    // 이미지가 있으면 먼저 삭제
+    if (post?.image_url) {
+      console.log('이미지 삭제 중...');
+      await deleteImage(post.image_url);
+    }
+
+    // 게시글 삭제
     const { error } = await supabase
       .from('posts')
       .delete()
@@ -407,13 +554,116 @@ function handleImagePreview(e) {
   const preview = document.getElementById('imagePreview');
 
   if (file) {
+    // 파일 크기 확인 (5MB 제한)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('이미지 크기는 5MB 이하여야 합니다.');
+      e.target.value = '';
+      preview.innerHTML = '';
+      return;
+    }
+
+    // 이미지 파일 형식 확인
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있습니다.');
+      e.target.value = '';
+      preview.innerHTML = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = function(e) {
-      preview.innerHTML = `<img src="${e.target.result}" alt="미리보기" style="max-width: 300px; border-radius: 8px;">`;
+      preview.innerHTML = `
+        <div style="position: relative; display: inline-block;">
+          <img src="${e.target.result}" alt="미리보기" style="max-width: 300px; border-radius: 8px;">
+          <p style="margin-top: 0.5rem; font-size: 14px; color: #666;">
+            파일명: ${file.name} (${(file.size / 1024).toFixed(2)} KB)
+          </p>
+        </div>
+      `;
     };
     reader.readAsDataURL(file);
   } else {
     preview.innerHTML = '';
+  }
+}
+
+// ====================================
+// 이미지 업로드 (Supabase Storage)
+// ====================================
+async function uploadImage(file) {
+  if (!file) return null;
+
+  try {
+    console.log('이미지 업로드 시작:', file.name);
+
+    // 파일명 생성 (고유한 이름: user_id + timestamp + 원본파일명)
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+    console.log('업로드 파일명:', fileName);
+
+    // Supabase Storage에 업로드
+    const { data, error } = await supabase.storage
+      .from('post-images')  // 버킷 이름
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('업로드 에러:', error);
+      throw error;
+    }
+
+    console.log('업로드 성공:', data);
+
+    // 공개 URL 가져오기
+    const { data: urlData } = supabase.storage
+      .from('post-images')
+      .getPublicUrl(fileName);
+
+    console.log('이미지 URL:', urlData.publicUrl);
+
+    return {
+      path: fileName,
+      url: urlData.publicUrl
+    };
+  } catch (error) {
+    console.error('이미지 업로드 실패:', error);
+    alert('이미지 업로드에 실패했습니다: ' + error.message);
+    return null;
+  }
+}
+
+// ====================================
+// 이미지 삭제 (Supabase Storage)
+// ====================================
+async function deleteImage(imagePath) {
+  if (!imagePath) return;
+
+  try {
+    console.log('이미지 삭제 시작:', imagePath);
+
+    // URL에서 파일 경로 추출
+    let filePath = imagePath;
+    if (imagePath.includes('/storage/v1/object/public/post-images/')) {
+      filePath = imagePath.split('/storage/v1/object/public/post-images/')[1];
+    }
+
+    const { error } = await supabase.storage
+      .from('post-images')
+      .remove([filePath]);
+
+    if (error) {
+      console.error('이미지 삭제 에러:', error);
+      // 이미지 삭제 실패해도 게시글 삭제는 진행
+      return;
+    }
+
+    console.log('✅ 이미지 삭제 성공');
+  } catch (error) {
+    console.error('이미지 삭제 실패:', error);
+    // 이미지 삭제 실패해도 계속 진행
   }
 }
 
