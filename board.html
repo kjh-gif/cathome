@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="집사 커뮤니티 - 고양이 집사들의 소통 공간">
+  <title>집사 커뮤니티 - Cat Home</title>
+
+  <!-- Pretendard 폰트 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <!-- 게시판 스타일시트 -->
+  <link rel="stylesheet" href="css/board.css">
+</head>
+<body>
+  <!-- 헤더 -->
+  <header>
+    <div class="header-container">
+      <h1><a href="index.html">Cat Home</a></h1>
+      <nav>
+        <ul>
+          <li><a href="index.html">홈</a></li>
+          <li><a href="board.html" class="active">집사 커뮤니티</a></li>
+          <li><a href="login.html" id="authLink">로그인</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="board-container">
+    <!-- 게시판 헤더 -->
+    <section class="board-header">
+      <h2>집사 커뮤니티</h2>
+      <div class="board-controls">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="제목으로 검색">
+          <button id="searchBtn">검색</button>
+        </div>
+        <button id="writeBtn" class="btn-write">글쓰기</button>
+      </div>
+    </section>
+
+    <!-- 게시글 목록 -->
+    <section class="board-list">
+      <table>
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+            <th>조회수</th>
+          </tr>
+        </thead>
+        <tbody id="postList">
+          <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
+        </tbody>
+      </table>
+
+      <!-- 페이지네이션 -->
+      <div class="pagination" id="pagination">
+        <!-- 페이지 번호가 여기에 동적으로 추가됩니다 -->
+      </div>
+    </section>
+
+    <!-- 게시글 작성 폼 (기본적으로 숨김) -->
+    <section class="write-form" id="writeForm" style="display: none;">
+      <h3>글쓰기</h3>
+      <form id="postForm">
+        <div class="form-group">
+          <label for="postTitle">제목</label>
+          <input type="text" id="postTitle" name="title" placeholder="제목을 입력하세요" required>
+        </div>
+
+        <div class="form-group">
+          <label for="postContent">내용</label>
+          <textarea id="postContent" name="content" rows="10" placeholder="내용을 입력하세요" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="postImage">이미지</label>
+          <input type="file" id="postImage" name="image" accept="image/*">
+          <div id="imagePreview"></div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" class="btn-submit">등록</button>
+          <button type="button" class="btn-cancel" id="cancelBtn">취소</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 게시글 상세보기 (기본적으로 숨김) -->
+    <section class="post-detail" id="postDetail" style="display: none;">
+      <article class="post">
+        <header class="post-header">
+          <h3 id="detailTitle"></h3>
+          <div class="post-info">
+            <span class="author" id="detailAuthor"></span>
+            <span class="date" id="detailDate"></span>
+            <span class="views" id="detailViews"></span>
+          </div>
+        </header>
+
+        <div class="post-image" id="detailImage">
+          <!-- 이미지가 있으면 여기에 표시됩니다 -->
+        </div>
+
+        <div class="post-content" id="detailContent">
+          <!-- 게시글 내용이 여기에 표시됩니다 -->
+        </div>
+
+        <div class="post-actions" id="postActions">
+          <button class="btn-edit" id="editBtn">수정</button>
+          <button class="btn-delete" id="deleteBtn">삭제</button>
+          <button class="btn-list" id="listBtn">목록</button>
+        </div>
+      </article>
+
+      <!-- 댓글 섹션 -->
+      <section class="comments">
+        <h4>댓글</h4>
+        <div class="comment-form">
+          <textarea id="commentInput" placeholder="댓글을 입력하세요" rows="3"></textarea>
+          <button id="commentSubmitBtn" class="btn-comment">댓글 작성</button>
+        </div>
+
+        <div class="comment-list" id="commentList">
+          <!-- 댓글 목록이 여기에 동적으로 추가됩니다 -->
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- 푸터 -->
+  <footer>
+    <p>&copy; 2024 Cat Home. All rights reserved.</p>
+  </footer>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 게시판 스크립트 -->
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/board.js"></script>
+</body>
+</html>
